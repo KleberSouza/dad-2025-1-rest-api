@@ -8,5 +8,7 @@ namespace apiRest.Models
 
         public DbSet<Usuario> Usuarios { get; set; }
 
+        public DbSet<Veiculo> Veiculos { get; set; }
+
     }
 }

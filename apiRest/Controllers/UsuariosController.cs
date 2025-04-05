@@ -22,16 +22,28 @@ namespace apiRest.Controllers
 
         // GET: api/Usuarios
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Usuario>>> GetUsuarios()
+        public async Task<dynamic> GetUsuarios(int page = 1, int pageSize = 5)
         {
-            return await _context.Usuarios.ToListAsync();
+            var usuarios = await _context.Usuarios
+                .Skip((page-1)*page)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return new { 
+                Items = usuarios,
+                CurrentPage = page,
+                PageSize = pageSize,
+                Total = await _context.Usuarios.CountAsync()
+            };
         }
 
         // GET: api/Usuarios/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Usuario>> GetUsuario(int id)
         {
-            var usuario = await _context.Usuarios.FindAsync(id);
+            var usuario = await _context.Usuarios
+                .Include(t => t.Veiculos)
+                .FirstOrDefaultAsync(c => c.Id == id);
 
             if (usuario == null)
             {
